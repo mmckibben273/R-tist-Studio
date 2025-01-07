@@ -125,7 +125,7 @@ The boxplot is nice, but with other packages we can make it even better.
 RStudio has a package called ggplot2 (Grammar of Graphics Plot). 
 
 ```{r}
-library(tidyverse)
+library(tidyverse) #RStudio has packages that contain lots of premade functions that can help us withour analysis. To load a package, type library() and put the name of the package in parentheses
 library(ggplot2)
 data$Month <- as.factor(data$Month) #To color code the months, group the data points that belong to each month first.
 ggplot(data = data)+ #Specify data set
