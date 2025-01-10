@@ -1,0 +1,186 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-01-04"
+---
+
+```{r }
+rm(list=ls())
+data <- airquality #This line calls the airquality set and gives it the name "data"
+head(data) #This shows a preview of the dataset
+```
+
+Let's create a simple plot of the dataset. To plot data, we need to tell RStudio what we want the x and y axis to be. 
+
+```{r}
+plot(data$Month,data$Temp)
+```
+
+This plot is alright, but can be improved. Do you notice what is missing?
+
+In addition to adding/changing labels on a plot, we can specify in our code how we want to visualize the data. When we did a simple plot command RStudio automatically created a scatterplot because of the input format. Let's try another plot, like a boxplot.
+
+```{r}
+plot(data$Month,data$Temp, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month")
+
+boxplot(Temp ~ Month, data=data, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month") #Notice the input for a boxplot is dependent~independent variable
+```
+
+Now make your own boxplot for wind speed each month.
+```{r}
+
+```
+
+The boxplot is nice, but with other packages we can make it even better.
+RStudio has a package called ggplot2 (Grammar of Graphics Plot). 
+
+```{r}
+library(tidyverse) #RStudio has packages that contain lots of premade functions that can help us with our analysis. To load a package, type library() and put the name of the package 
+library(ggplot2)
+data$Month <- as.factor(data$Month) #To color code the months, group the data points that belong to each month first.
+ggplot(data)+ #Specify data set
+  aes(x = Month, y = Temp, fill = Month)+ #Your aesthetics. Identify your x and y axis as well as how you want to color code.
+  geom_boxplot()+ #What type of figure/plot to create
+  ylab("Temperature") + # x label
+  xlab("Month") + # y label
+  ggtitle("Temperature over each Month")+
+  theme_classic()
+```
+
+
+Great! Using ggplot, let's make some other figures. First, let's practice with a bar plot and a really useful dataset, the Palmer Penguin dataset.
+```{r }
+library(palmerpenguins) #Load the package containing the palmer penguin dataset
+data1 <- palmerpenguins::penguins #load the specific penguin dataset from the package
+
+ggplot(data1) + #This line tells RStudio what dataset you are pulling data from
+  aes(x = island, fill = species)+ #The aesthetics command tells ggplot what variable from the dataset to plot on the x axis
+  geom_bar()+ #What type of figure/plot to create, in this case a bar plot with geom_bar()
+  ylab("Number of Penguins") + # y label
+  xlab("Island") + # x label
+  ggtitle("Penguins Across Islands")+ #Title of dataset
+  theme_classic() #Theme changes the background from a grid to clear white. Feel free to explore how other themes (check Day 2 powerpoint for list of possible themes or look it up on your own)
+```
+
+
+Imitating the code above, run your own code creating a bar graph for the number of penguins in each species sampled and how many of each sex there were.
+```{r}
+
+```
+
+We can also represent the number of species as a pie chart.
+
+```{r}
+mytable <- table(data1$species) #This command pulls out the column we will be making a pie chart with and makes it into a table format
+head(mytable)
+lbls <- paste(names(mytable), "\n", mytable, sep="") # The paste() command tells RStudio to combine strings of characters and/or numbers. First, we pull the names of the columns from the dataset mytable. Then the command "/n" attaches the number in the column to the name. We then put the dataset we are pulling the labels from, mytable, and what separates columns, in this case spaces, which are represented by sep = "".
+pie(mytable, labels = lbls,
+   main="Pie Chart of Species\n (with sample sizes)")
+```
+
+Create a pie chart showing how many penguins were sampled on each island.
+
+```{r}
+
+```
+
+Now that we've played around with the penguin dataset, let's try looking at a flower dataset. Use the code below to create a histogram showing the sepal length of the flowers, colored by the species they belong to.
+
+```{r}
+data2 <- iris
+ggplot(data2, aes(x = Sepal.Length, fill=Species)) +
+  geom_histogram(binwidth = 0.5)+ #Try changing the bin width and rerunning the code to see how it changes your visualization. When deciding binwidths for your histograms, make sure to think about the range/length of your x axis.
+  theme_classic()
+```
+
+Create your own histogram looking at petal width across species.
+
+```{r}
+
+```
+
+We can also use the flower data to create a scatterplot comparing two of the variables.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width) +
+  geom_point() +
+  theme_classic()
+
+```
+
+This plot seems random and doesn't tell us much about the dataset. See what happens when you color by species.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) + #In this line we tell ggplot to color the points by the flower species
+  geom_point() +
+  theme_classic()
+```
+
+Now write your own code to compare petal length and petal width.
+
+```{r}
+
+```
+
+We can also draw lines across our scatterplot to identify trends in the data.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) +
+  geom_point() +
+  geom_smooth(se=FALSE)+ #This line tells ggplot to create a line connecting the points. se=FALSE tells ggplot not to show the standard error of the lines. If you change this to TRUE, it will show standard error on the graph for each line.
+  theme_classic()
+```
+
+
+Now let's create a map showing the distribution of buckeyes.
+
+```{r}
+library(readr)
+Buckeye <- read_csv("Buckeye.csv") #Load imported dataset
+View(Buckeye)
+```
+
+Below is code to plot the distibution of buckeyes on a map. It is purposefully offcenter. After running the code and seeing what the map looks like, play with the x and y axis limits in the code to recenter your graph.
+
+```{r}
+library(maps) #Load package with prebuilt maps
+world<-map_data("world") 
+us<-map_data("state")
+gg1 <- ggplot(world, aes(x=long,y=lat,group=group))+ #When plotting on a world map, always keep this line the same for ggplot. This will plot the first layer, the base of your map. We will plot the distribution of buckeyes, Aesculus glabra, on top.
+  xlab("Longitude")+
+  ylab("Latitude")+
+  geom_polygon(fill="gray90")+ #Color of your map. Can be changed if you want.
+  geom_jitter(data = Buckeye, #geom_jitter tries to separate points slightly rather than putting them on top of each other.
+              aes(x = decimalLongitude, y = decimalLatitude),size=0.5,
+              inherit.aes = FALSE,
+              width = 0,
+              height = 0, 
+              alpha = 0.8) +
+  scale_shape_manual(values = c(17,16))+
+  coord_quickmap(xlim=c(-156,-64),ylim=c(-23,50)) + #Play with the latitude and longitude to make the graph more centered
+  theme_bw()+theme(legend.position="right",legend.title=element_blank())+
+  theme(axis.text=element_text(size=15))+
+  theme(axis.title=element_text(size=15))
+plot(gg1)
+```
+
+
+Extra: More complicated graph with tidying we will learn next week!
+
+```{r}
+dt <- read.csv("https://rb.gy/zr65gg")
+dti <- dt[(dt$state == "Ohio") & (dt$cases > 10^4), ]
+ggplot(data = dti) + 
+  aes(x = reorder(county, cases), y = cases) + # order labels according to cases
+  geom_col() +
+  ylab("Number of COVID cases reported") + # x label
+  xlab("Ohio County") + # y label
+  scale_y_log10() + # transform the counts to logs
+  coord_flip()+
+  ggtitle(dti$date[1]) # main title (use current date)+
+  theme_classic()
+```
+
