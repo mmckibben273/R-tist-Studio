@@ -45,11 +45,7 @@ ggplot(data2, aes(x = Sepal.Length, fill=Species)) +
 Create your own histogram looking at petal width across species.
 
 ```{r}
-data2 <- iris
-bw <- (2 * IQR(data2$Petal.Width)) / (length(data2$Petal.Width)^(1/3)) #This equation uses the Freedman-Diaconis rule (FD) to give give you a good estimate for which binwidth to choose.
-ggplot(data2, aes(x = Petal.Width, fill=Species)) +
-  geom_histogram(binwidth = bw)+ #Try changing the bin width and rerunning the code to see how it changes your visualization. When deciding binwidths for your histograms, make sure to think about the range/length of your x axis and how your counts are distributed.
-  theme_classic()
+
 ```
 
 We can also use the flower data to create a scatterplot comparing two of the variables.
