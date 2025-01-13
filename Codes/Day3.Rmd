@@ -25,11 +25,7 @@ pie(mytable, labels = lbls,
 Create a pie chart showing how many penguins were sampled on each island.
 
 ```{r}
-mytable <- table(data1$island) #This command pulls out the column we will be making a pie chart with and makes it into a table format
-head(mytable)
-lbls <- paste(names(mytable), "\n", mytable, sep="") # The paste() command tells RStudio to combine strings of characters and/or numbers. First, we pull the names of the columns from the dataset mytable. Then the command "/n" attaches the number in the column to the name. We then put the dataset we are pulling the labels from, mytable, and what separates columns, in this case spaces, which are represented by sep = "".
-pie(mytable, labels = lbls,
-   main="Pie Chart of Penguin Distribution Across Islands\n (with sample sizes)")
+
 ```
 
 Now that we've played around with the penguin dataset, let's try looking at a flower dataset. Use the code below to create a histogram showing the sepal length of the flowers, colored by the species they belong to.
