@@ -76,14 +76,7 @@ ggplot(data = data2) +
 Now write your own code to compare petal length and petal width.
 
 ```{r}
-ggplot(data = data2) +
-  aes(x = Petal.Length, y = Petal.Width, color=Species) + #In this line we tell ggplot to color the points by the flower species
-  xlab("Petal Length")+
-  ylab("Petal Width")+
-  geom_smooth(se=FALSE)+
-  ggtitle("Petal Width by Petal Length")+
-  geom_point() +
-  theme_classic()
+
 ```
 
 We can also draw lines across our scatterplot to identify trends in the data.
