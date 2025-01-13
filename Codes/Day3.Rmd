@@ -1,0 +1,192 @@
+---
+title: "Day 3"
+output: html_document
+date: "2025-01-12"
+---
+
+```{r }
+rm(list=ls())
+library(tidyverse)
+library(palmerpenguins) #Load the package containing the palmer penguin dataset
+data1 <- palmerpenguins::penguins #load the specific penguin dataset from the package
+select <- dplyr::select
+```
+
+We practiced on Friday creating a bar graph to look at the number of peguins in each species. We can also represent the number of species as a pie chart.
+
+```{r}
+mytable <- table(data1$species) #This command pulls out the column we will be making a pie chart with and makes it into a table format
+head(mytable)
+lbls <- paste(names(mytable), "\n", mytable, sep="") # The paste() command tells RStudio to combine strings of characters and/or numbers. First, we pull the names of the columns from the dataset mytable. Then the command "/n" attaches the number in the column to the name. We then put the dataset we are pulling the labels from, mytable, and what separates columns, in this case spaces, which are represented by sep = "".
+pie(mytable, labels = lbls,
+   main="Pie Chart of Species\n (with sample sizes)")
+```
+
+Create a pie chart showing how many penguins were sampled on each island.
+
+```{r}
+mytable <- table(data1$island) #This command pulls out the column we will be making a pie chart with and makes it into a table format
+head(mytable)
+lbls <- paste(names(mytable), "\n", mytable, sep="") # The paste() command tells RStudio to combine strings of characters and/or numbers. First, we pull the names of the columns from the dataset mytable. Then the command "/n" attaches the number in the column to the name. We then put the dataset we are pulling the labels from, mytable, and what separates columns, in this case spaces, which are represented by sep = "".
+pie(mytable, labels = lbls,
+   main="Pie Chart of Penguin Distribution Across Islands\n (with sample sizes)")
+```
+
+Now that we've played around with the penguin dataset, let's try looking at a flower dataset. Use the code below to create a histogram showing the sepal length of the flowers, colored by the species they belong to.
+
+```{r}
+data2 <- iris
+bw <- (2 * IQR(data2$Sepal.Length)) / (length(data2$Sepal.Length)^(1/3)) #This equation uses the Freedman-Diaconis rule (FD) to give give you a good estimate for which binwidth to choose.
+ggplot(data2, aes(x = Sepal.Length, fill=Species)) +
+  geom_histogram(binwidth = 0.25)+ #Try changing the bin width and rerunning the code to see how it changes your visualization. When deciding binwidths for your histograms, make sure to think about the range/length of your x axis and how your counts are distributed.
+  theme_classic()
+```
+
+Create your own histogram looking at petal width across species.
+
+```{r}
+data2 <- iris
+bw <- (2 * IQR(data2$Petal.Width)) / (length(data2$Petal.Width)^(1/3)) #This equation uses the Freedman-Diaconis rule (FD) to give give you a good estimate for which binwidth to choose.
+ggplot(data2, aes(x = Petal.Width, fill=Species)) +
+  geom_histogram(binwidth = bw)+ #Try changing the bin width and rerunning the code to see how it changes your visualization. When deciding binwidths for your histograms, make sure to think about the range/length of your x axis and how your counts are distributed.
+  theme_classic()
+```
+
+We can also use the flower data to create a scatterplot comparing two of the variables.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width) +
+  xlab("Sepal Length")+
+  ylab("Sepal Width")+
+  ggtitle("Sepal Width by Sepal Length")+
+  geom_point() +
+  theme_classic()
+
+```
+
+This plot seems random and doesn't tell us much about the dataset. See what happens when you color by species.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) + #In this line we tell ggplot to color the points by the flower species
+  xlab("Sepal Length")+
+  ylab("Sepal Width")+
+  ggtitle("Sepal Width by Sepal Length")+
+  geom_point() +
+  theme_classic()
+```
+
+Now write your own code to compare petal length and petal width.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Petal.Length, y = Petal.Width, color=Species) + #In this line we tell ggplot to color the points by the flower species
+  xlab("Petal Length")+
+  ylab("Petal Width")+
+  geom_smooth(se=FALSE)+
+  ggtitle("Petal Width by Petal Length")+
+  geom_point() +
+  theme_classic()
+```
+
+We can also draw lines across our scatterplot to identify trends in the data.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) +
+  geom_point() +
+  geom_smooth(se=FALSE)+ #This line tells ggplot to create a line connecting the points. se=FALSE tells ggplot not to show the standard error of the lines. If you change this to TRUE, it will show standard error on the graph for each line.
+  xlab("Sepal Length")+
+  ylab("Sepal Width")+
+  ggtitle("Sepal Width by Sepal Length")+
+  theme_classic()
+```
+
+
+Now let's create a map showing the distribution of buckeyes.
+
+```{r}
+library(readr)
+Buckeye <- read_csv("Buckeye.csv") #Load imported dataset
+View(Buckeye)
+```
+
+Below is code to plot the distibution of buckeyes on a map. It is purposefully offcenter. After running the code and seeing what the map looks like, play with the x and y axis limits in the code to recenter your graph.
+
+```{r}
+library(maps) #Load package with prebuilt maps
+world<-map_data("world") 
+us<-map_data("state")
+gg1 <- ggplot(world, aes(x=long,y=lat,group=group))+ #When plotting on a world map, always keep this line the same for ggplot. This will plot the first layer, the base of your map. We will plot the distribution of buckeyes, Aesculus glabra, on top.
+  xlab("Longitude")+
+  ylab("Latitude")+
+  geom_polygon(fill="gray90")+ #Color of your map. Can be changed if you want.
+  geom_jitter(data = Buckeye, #geom_jitter tries to separate points slightly rather than putting them on top of each other.
+              aes(x = decimalLongitude, y = decimalLatitude),size=0.5,
+              inherit.aes = FALSE,
+              width = 0,
+              height = 0, 
+              alpha = 0.8) +
+  scale_shape_manual(values = c(17,16))+
+  coord_quickmap(xlim=c(-150,-75),ylim=c(-50,70)) + #Play with the latitude and longitude to make the graph more centered
+  theme_bw()+theme(legend.position="right",legend.title=element_blank())+
+  theme(axis.text=element_text(size=15))+
+  theme(axis.title=element_text(size=15))
+plot(gg1)
+```
+
+
+Now that we've made some basic plots, let's practice making being more specific with our visualizations. We'll start by using our palmer penguin dataset, saved with variable name data1, to look at the data for only one island.
+
+```{r}
+filter(data1, island == "Biscoe") #The filter command takes the input filter(dataset,column name == "variable we want to have")
+```
+
+To pull out specific columns in the dataframe, we can use select().
+
+```{r}
+select(data1, species, island, sex) #For this command, use select(dataset,column(s) to pull out)
+select(data1, -year, -body_mass_g) #By putting a minus sign, we can exclude some columns from the dataset
+distinct(select(data1, species)) #Using the distinct() command removes all duplicates in the column we specify
+```
+
+This can get complicated if we have multiple tidying steps we want to incorporate. Luckily, we can make a pipeline in RStudio that connects multiple commands. We've been doing this in a way with our ggplot diagrams, with commands connected by + signs. To make a pipeline, we will type %>%.
+
+```{r}
+data1 %>%  #This tells RStudio to look at our Palmer Penguin dataset
+  drop_na(body_mass_g) %>% #This drops NA (not applicable/data not collected) values from the body mass column
+  summarise(avg = mean(body_mass_g), 
+            sd = sd(body_mass_g), 
+            median = median(body_mass_g))
+```
+
+What if we want to know the average body mass for each species?
+
+```{r}
+data1 %>% 
+  drop_na() %>% 
+  group_by(species) %>% #This separates the data and looks at the mean body mass for each species independently.
+  summarise(mean = mean(body_mass_g, na.rm = TRUE))
+```
+
+
+```{r}
+data1 %>% 
+  drop_na() %>% 
+  group_by(species, island) %>% #This separates the data and looks at the mean body mass for each species independently across each island.
+  summarise(mean = mean(body_mass_g, na.rm = TRUE))
+```
+
+Explore data tidying with the starwars dataset below. 
+
+```{r}
+data <- starwars
+
+data %>% 
+  drop_na() %>% 
+  group_by(species, gender) %>% #This separates the data and looks at the mean body mass for each species independently across each island.
+  summarise(mean = mean(height, na.rm = TRUE)) 
+```
+
+
