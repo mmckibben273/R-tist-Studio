@@ -172,10 +172,7 @@ Explore data tidying with the starwars dataset below.
 ```{r}
 data <- starwars
 
-data %>% 
-  drop_na() %>% 
-  group_by(species, gender) %>% #This separates the data and looks at the mean body mass for each species independently across each island.
-  summarise(mean = mean(height, na.rm = TRUE)) 
+
 ```
 
 
