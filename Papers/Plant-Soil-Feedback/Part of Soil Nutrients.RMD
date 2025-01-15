@@ -1,0 +1,91 @@
+---
+title: "Day 5"
+output: html_document
+date: "2025-01-15"
+---
+
+```{r setup, include=FALSE}
+#install.packages("reshape2")
+library(reshape2)
+#install.packages("QuantPsyc")
+library("QuantPsyc")
+library(ggplot2)
+#install.packages("lattice")
+library(lattice)
+library(plyr)
+#install.packages("multcomp")
+library(multcomp)
+library(nlme)
+#install.packages("emmeans")
+library(emmeans)
+```
+
+
+
+```{r cars}
+Data=read.table("Nutrients_conditioning.txt",h=T)
+
+head(Data)
+```
+
+
+
+```{r pressure, echo=FALSE}
+# A. Missing values?
+colSums(is.na(Data)) #no missing values
+```
+
+
+
+```{r}
+vf <- varIdent(form = ~ 1|Soil)
+model <- gls(NO3 ~ Soil, data=Data)
+qqnorm(resid(model))
+plot(model) #mja
+emmeans(model, pairwise ~ Soil)
+```
+
+```{r}
+#plots
+#NO3
+#Calculate mean and SE for plot
+NO3mean <- ddply(Data, c("Soil"), summarise,
+                     N    = length(NO3),
+                     mean = mean(NO3),
+                     sd   = sd(NO3),
+                     se   = sd / sqrt(N)
+  )
+
+NO3mean
+```
+
+```{r}
+#reorder soils
+NO3mean$labels <- factor(c("Ao", "Fr", "Lh", "mix", "Pl"))
+NO3mean$labels <- factor(ordered(NO3mean$labels, levels = c("mix", "Ao", "Fr", "Lh", "Pl")))
+
+#Add significance
+NO3mean$sig <- c("b", "c", "c", "a", "b")
+```
+
+```{r}
+plotNO3 <- ggplot(data = NO3mean, aes(y = NO3mean$mean, x = NO3mean$labels, fill=NO3mean$labels)) + 
+  geom_hline(yintercept = NO3mean$mean[NO3mean$Soil=="Mix"], colour = "#D55E00", size = 1, lty = "longdash") +
+  scale_fill_manual(values=c("#D55E00", "grey30", "grey30", "grey30", "grey30"), name=element_blank()) +
+  geom_bar(colour= "black",stat="identity", position=position_dodge()) +
+  geom_errorbar(data=NO3mean, aes(ymin = mean-se, ymax = mean+se), width=.4,position=position_dodge(.9))+
+  geom_text(data=NO3mean, aes(label = paste(sig), y=mean+se), position = position_dodge(width = 0.9), vjust = -1, size=4)+
+  theme_bw()+
+  theme(axis.text=element_text(size=11))+
+  theme(axis.title.x = element_blank())+
+  theme(axis.text.x=element_text(size=11))+
+  theme(axis.title.y=element_text(size=12, colour = "black",margin=(margin(0,10,0,0))))+
+  labs(y=expression(NO[3]^{"-"}~?mol %.% kg^{-1}))+
+  coord_cartesian(ylim=c(0, 6500)) +
+  theme(legend.position= "none")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(strip.text.x=element_text(size=11, face="bold"), strip.background=element_rect(fill="grey"))
+
+plotNO3 
+```
+
