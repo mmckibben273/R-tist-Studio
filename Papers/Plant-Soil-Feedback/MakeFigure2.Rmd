@@ -1,0 +1,277 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-01-16"
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+library(reshape2)
+library("QuantPsyc")
+library(ggplot2)
+library(lattice)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+setwd("/Users/mirandamckibben/Downloads/dataverse_files") #pc
+Data=read.table("THE MASTER SHEET.txt",h=T)
+
+head(Data)
+
+#Devide root biomass by 4
+Data$Root <- Data$Root/Data$Nplants
+
+#Calculate total biomass
+Data$Total<-Data$Shoot + Data$Root
+
+#Calculate root:shoot ratio
+Data$Ratio<-Data$Root/Data$Shoot
+colSums(is.na(Data)) #no missing values, except for mychorrhizae counting, but that's correct
+
+# B. Outliers
+MyVar <- c("Root", "Shoot")      
+#Sort Data
+Data<-Data[order(Data$Species, Data$Soil, Data$Nutrient, Data$Myc, Data$Rep),]
+
+#ID for species, soil, nutrient, myc
+Data$ID <- paste(Data$Soil, Data$Nutrient,
+                 sep = ".")
+Data$ID <- factor(Data$ID)
+Data$ID
+
+#Make factor of tablehalf and block
+Data$fTablehalf<-as.factor(Data$Tablehalf)
+Data$fBlock<-as.factor(Data$Block)
+
+#subset for nutrient analysis only
+Datamin<-Data[ which(Data$Myc=="Min"),]
+Datamin
+str(Datamin)
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = Datamin, 
+                      aes(y = Shoot, 
+                          x = ID))                 
+p <- p + ylab("Shoot")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#Nutrients are beneficial for shoot growth
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = Datamin, 
+                      aes(y = Root, 
+                          x = ID))                 
+p <- p + ylab("Root")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#Nutrient effect less clear here
+
+plot(Root~Shoot, data=Datamin)
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = Datamin, 
+                      aes(y = Total, 
+                          x = ID))                 
+p <- p + ylab("Total")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#For Lh and Pl clear nutrient effect, but Ao and Fr less
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = Datamin, 
+                      aes(y = Ratio, 
+                          x = ID))                 
+p <- p + ylab("RootShootRatio")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+```
+
+```{r}
+Datamin$ID[Datamin$Nplants==3]
+Datamin$Species[Datamin$Nplants==3]
+Datamin[40:91,]
+
+Datamin2<- Datamin[which (Datamin$Nplants==4),]
+head(Datamin2)
+```
+
+
+```{r pressure, echo=FALSE}
+
+PSFS <- (Datamin$Shoot[Datamin$Soil=="Own"]-Datamin$Shoot[Datamin$Soil=="Mix"]) / Datamin$Shoot[Datamin$Soil=="Mix"]
+PSFR <- (Datamin$Root[Datamin$Soil=="Own"]-Datamin$Root[Datamin$Soil=="Mix"]) / Datamin$Root[Datamin$Soil=="Mix"]
+PSFT <- (Datamin$Total[Datamin$Soil=="Own"]-Datamin$Total[Datamin$Soil=="Mix"]) / Datamin$Total[Datamin$Soil=="Mix"]
+
+#make dataframe
+PSF <- data.frame(Datamin$Species[Datamin$Soil=="Own"], Datamin$Nutrient[Datamin$Soil=="Own"], PSFS, PSFR, PSFT)
+colnames(PSF) <- c("Species", "Nutrient", "PSFS", "PSFR", "PSFT")
+head(PSF)
+
+Datamin$ID[Datamin$Nplants==3]
+Datamin$Species[Datamin$Nplants==3]
+Datamin[40:91,]
+#Fr own high min 6
+#Lh own high min 1
+#Lh own high min 5
+#Add to PSF dataframa
+
+PSF$Nplants <- 4
+PSF$rep <- c(1:6)
+PSF$Nplants[PSF$Species=="Fr" & PSF$Nutrient=="high" & PSF$rep=="6"] <- 3
+PSF$Nplants[PSF$Species=="Lh" & PSF$Nutrient=="high" & PSF$rep=="1"] <- 3
+PSF$Nplants[PSF$Species=="Lh" & PSF$Nutrient=="high" & PSF$rep=="5"] <- 3
+PSF
+
+# B. Outliers
+MyVar <- c("PSFS", "PSFR", "PSFT")      
+
+#possibly PSFS has an outlier --> above 1
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = PSF, 
+                      aes(y = PSFS, 
+                          x = Nutrient))                 
+p <- p + ylab("PSFS")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#Nutrients matter for Lh and Pl, but not for Ao and Fr
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = PSF, 
+                      aes(y = PSFR, 
+                          x = Nutrient))                 
+p <- p + ylab("PSFR")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#Nutrient matter for Lh, Pl check data
+
+# Visualize
+p <- ggplot()
+p <- p + geom_boxplot(data = PSF, 
+                      aes(y = PSFT, 
+                          x = Nutrient))                 
+p <- p + ylab("PSFT")
+p <- p + theme(text = element_text(size=15)) 
+p <- p + facet_wrap(~ Species, scales = "fixed")
+p
+#Nutrients matter for Lh and Pl
+
+#To try without pots with 3 plants
+PSF2 <- PSF[which (PSF$Nplants==4),]
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+library(plyr)
+
+#Calculate mean and SE for plot
+PSFSmean <- ddply(PSF2, c("Species", "Nutrient"), summarise,
+               N    = length(PSFS),
+               mean = mean(PSFS),
+               sd   = sd(PSFS),
+               se   = sd / sqrt(N)
+)
+
+#reorder nutrients
+#PSFSmean$Nutrient <- factor(PSFSmean$Nutrient, levels = unique(PSFSmean$Nutrient[rev(PSFSmean[,2])]))
+
+#Add species names
+PSFSmean$labels <- c("Anthoxanthum", "Anthoxanthum", "Festuca", "Festuca", "Leontodon", "Leontodon", "Plantago", "Plantago") 
+PSFSmean$sig1 <- c("", "ns", "", "ns", "", "", "", "")
+PSFSmean$sig2 <- c("", "", "", "", "", " **", "", "***")
+
+#PSFS
+plotA <- ggplot(data = PSFSmean, aes(y = mean, x = Nutrient, fill = Nutrient)) + 
+  facet_wrap(~ labels, ncol=4) +
+  scale_fill_manual(values=c("#D55E00", "#009E73"), name=element_blank(), breaks = c("low", "high"), labels = c("low nutrients", "high nutrients")) +
+  geom_bar(colour= "black",stat="identity", position=position_dodge()) +
+  geom_errorbar(data=PSFSmean, aes(ymin = mean-se, ymax = mean+se), width=.4,position=position_dodge(.9))+
+  geom_hline(yintercept = 0) +
+  geom_text(data=PSFSmean, aes(label = paste(sig1), y=c(0.26, 0.26, 0.20, 0.20, 0.75, 0.75, -0.50, -0.50)), position = position_dodge(width = 0.9), hjust = -1.4, size=3.5)+
+  geom_text(data=PSFSmean, aes(label = paste(sig2), y=c(0.26, 0.26, 0.20, 0.20, 0.73, 0.73, -0.50, -0.50)), position = position_dodge(width = 0.9), hjust = -0.8, size=5)+
+  theme_bw()+
+  theme(axis.text=element_text(size=11))+
+  theme(axis.title.x = element_blank())+
+  theme(axis.text.x=element_text(size=11))+
+  theme(axis.title.y=element_text(size=12, colour = "black",margin=(margin(0,10,0,0))))+
+  labs(y="Plant-soil feedback
+       shoot")+
+  theme(legend.position= "none")+
+  #theme(legend.position= c(0.12,0.9))+
+  #theme(legend.text = element_text(size = 10))+
+  #theme(legend.key.size = unit(0.15, "in"))+  
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(legend.background = element_blank())+
+  coord_cartesian(ylim = c(-0.5, 0.75))+
+  theme(strip.text.x=element_text(size=11, face="bold"), strip.background=element_rect(fill="grey"))
+
+plotA
+```
+
+```{r}
+PSFRmean <- ddply(PSF2, c("Species", "Nutrient"), summarise,
+                  N    = length(PSFR),
+                  mean = mean(PSFR),
+                  sd   = sd(PSFR),
+                  se   = sd / sqrt(N)
+)
+
+#reorder nutrients
+#PSFRmean$Nutrient <- factor(PSFRmean$Nutrient, levels = unique(PSFRmean$Nutrient[rev(PSFRmean[,2])]))
+
+#Add species names
+PSFRmean$labels <- c("Anthoxanthum", "Anthoxanthum", "Festuca", "Festuca", "Leontodon", "Leontodon", "Plantago", "Plantago") 
+PSFRmean$sig1 <- c("", "ns", "", "ns", "", "", "", "ns")
+PSFRmean$sig2 <- c("", "", "", "", "", "  *", "", "")
+
+#PSFR
+plotB <- ggplot(data = PSFRmean, aes(y = mean, x = Nutrient, fill = Nutrient)) + 
+  facet_wrap(~ labels, ncol=4) +
+  scale_fill_manual(values=c("#D55E00", "#009E73"), name=element_blank(), breaks = c("low", "high"), labels = c("low nutrients", "high nutrients")) +
+  geom_bar(colour= "black",stat="identity", position=position_dodge()) +
+  geom_errorbar(data=PSFRmean, aes(ymin = mean-se, ymax = mean+se), width=.4,position=position_dodge(.9))+
+  geom_hline(yintercept = 0) +
+  geom_text(data=PSFRmean, aes(label = paste(sig1), y=c(-0.42, -0.42, 0.68, 0.68, 0.30, 0.30, -0.22, -0.22)), position = position_dodge(width = 0.9), hjust = -1.4, size=3.5)+
+  geom_text(data=PSFRmean, aes(label = paste(sig2), y=c(-0.42, -0.42, 0.68, 0.68, 0.30, 0.30, -0.22, -0.22)), position = position_dodge(width = 0.9), hjust = -0.8, size=5)+
+  theme_bw()+
+  theme(axis.text=element_text(size=11))+
+  theme(axis.title.x = element_blank())+
+  theme(axis.text.x=element_text(size=11))+
+  theme(axis.title.y=element_text(size=12, colour = "black",margin=(margin(0,10,0,0))))+
+  labs(y="Plant-soil feedback
+       root")+
+  theme(legend.position= "none")+
+  #theme(legend.position= c(0.12,0.9))+
+  #theme(legend.text = element_text(size = 10))+
+  #theme(legend.key.size = unit(0.15, "in"))+  
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  theme(legend.background = element_blank())+
+  coord_cartesian(ylim = c(-0.5, 0.75))+
+  theme(strip.text.x=element_text(size=11, face="bold"), strip.background=element_rect(fill="grey"))
+
+plotB
+
+library(cowplot)
+plotPSF_nutrient <- plot_grid(plotA, plotB, labels=c("A", "B"), ncol=1)
+plotPSF_nutrient
+```
+
