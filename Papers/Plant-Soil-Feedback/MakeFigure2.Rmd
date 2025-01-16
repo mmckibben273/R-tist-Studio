@@ -12,14 +12,9 @@ library(ggplot2)
 library(lattice)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r }
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-setwd("/Users/mirandamckibben/Downloads/dataverse_files") #pc
 Data=read.table("THE MASTER SHEET.txt",h=T)
 
 head(Data)
@@ -34,8 +29,7 @@ Data$Total<-Data$Shoot + Data$Root
 Data$Ratio<-Data$Root/Data$Shoot
 colSums(is.na(Data)) #no missing values, except for mychorrhizae counting, but that's correct
 
-# B. Outliers
-MyVar <- c("Root", "Shoot")      
+     
 #Sort Data
 Data<-Data[order(Data$Species, Data$Soil, Data$Nutrient, Data$Myc, Data$Rep),]
 
@@ -100,17 +94,9 @@ p <- p + facet_wrap(~ Species, scales = "fixed")
 p
 ```
 
-```{r}
-Datamin$ID[Datamin$Nplants==3]
-Datamin$Species[Datamin$Nplants==3]
-Datamin[40:91,]
-
-Datamin2<- Datamin[which (Datamin$Nplants==4),]
-head(Datamin2)
-```
 
 
-```{r pressure, echo=FALSE}
+```{r }
 
 PSFS <- (Datamin$Shoot[Datamin$Soil=="Own"]-Datamin$Shoot[Datamin$Soil=="Mix"]) / Datamin$Shoot[Datamin$Soil=="Mix"]
 PSFR <- (Datamin$Root[Datamin$Soil=="Own"]-Datamin$Root[Datamin$Soil=="Mix"]) / Datamin$Root[Datamin$Soil=="Mix"]
@@ -179,7 +165,6 @@ PSF2 <- PSF[which (PSF$Nplants==4),]
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 ```{r}
 library(plyr)
 
