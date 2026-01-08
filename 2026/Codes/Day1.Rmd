@@ -1,0 +1,139 @@
+---
+title: "Intro to R"
+output: html_document
+date: "2023-10-13"
+---
+
+When performing calculations in RStudio Markdown, make sure to type your code in the shaded areas. These are called "code chunks." To perform basic equations:
++ for addition
+- for subtraction
+* for multiplication
+/ for division
+^ for exponentials
+
+Run the code chunk below by clicking on the green arrow in the right hand corner of the shaded area.
+```{r}
+2+3
+2-3
+2*3
+2^3
+2/3
+```
+
+Try typing in some of your own small equations in the empty chunk below. Make sure you type your code between the ```{r} and ```.
+```{r}
+
+```
+
+While we can see the results of our equations, we probably don't want to retype the equation every time we want a certain value. To save the number we can assign it a "variable name." A variable name can be a single letter or a word. Be careful: RStudio is case sensitive (lowercase letters and uppercase letters matter), meaning a variable saved as "Data" will not be recognized if you try to use "data" instead.
+
+When assigning a variable name, make sure you follow the correct order: Variable name, <-, what you're assigning. Run the code chunk below and note where you see the output.
+```{r}
+a <- 4
+b <- 7
+c <- 11
+x <- 2+3 
+y <- 2*3
+z <- 2^3
+```
+
+RStudio can generate random numbers. Run the code chunk below to get 3 random numbers between 0 and 100. Then write your own code to assign those three variables names.
+```{r}
+runif(3, min=0, max=100) #Using a hashtag like this creates a comment that does not run as code but is useful as notes to explain what lines of code do. If you want only integers (no decimal points), use floor(runif(3, min=0, max=100))
+
+
+
+
+```
+
+Variables don't need to be a single number. They can also be lists of numbers. In RStudio, a list containing the same types of values (all numbers, all characters, etc.) is called a vector. 
+
+```{r }
+x <- c(1,3,5,7,9,11) #When making a vector, type c(), and fill in the list within the parentheses. Separate numbers with commas.
+y <- c(y,z) #Because the y variable we assigned was 6 and z was 8, the new y variable is (6,8)
+```
+
+Run the code chunk below to get 6 new numbers. Then assign them to x.
+
+```{r}
+floor(runif(6, min=0, max=100))
+
+```
+
+RStudio has functions that can be used to perform basic statistics. Our x variable has 6 numbers, so we could probably calculate it ourselves, but these can be especially useful for large datasets. These calculations can be run on columns or rows in datasets. Run the code chunk below to see what values you get for your x variable.
+```{r }
+min(x) #minimum value in x
+max(x) #maximum value in x
+mean(x) #average value of x
+length(x) #number of variables in x
+sum(x) #sum of x
+var(x) #variance of x
+summary(x) #summary of x
+```
+Now let's see what RStudio can do with datasets.
+RStudio, being an opensource platform, has a large number of publicly available datasets. Run the code below to see some of the datasets.
+
+```{r}
+data()
+```
+
+Notice that at the bottom of the dataset list it says "Use ‘data(package = .packages(all.available = TRUE))’
+to list the data sets in all *available* packages." Let's try that!
+```{r}
+data(package = .packages(all.available = TRUE))
+```
+
+
+We are going to start with a simple data set with several variables. Use the code chunk below to load airquality and preview the dataset.
+```{r}
+data <- airquality #This line calls the airquality set and gives it the name "data"
+head(data) #This shows a preview of the dataset
+```
+
+As mentioned before, we can use RStudio to run stats on columns and rows in a dataset. 
+```{r}
+Temp <- data$Temp #Assign variable name to a column in the dataset. To pull out a column, you can use the variable name you assigned the dataset followed by a dollar sign ($) and the name of the column you want.
+summary(Temp) #Provides some information about the column, such as minimum value, maximum, mean, etc.
+```
+
+In the code chunk below, write code that will find the average wind speed.
+```{r}
+
+```
+
+There is a small problem with this: What is the unit of measurement for the wind speed? Often the datasets have simple names for their columns. To learn more about the context of our data, we need to know where it comes from. Type ?airquality in you console pane and read about the dataset.
+
+
+Let's create a simple plot of the dataset. To plot data, we need to tell RStudio what we want the x and y axis to be. 
+```{r}
+plot(data$Month,data$Temp)
+```
+
+This plot is alright, but can be improved. Do you notice what is missing?
+
+In addition to adding/changing labels on a plot, we can specify in our code how we want to visualize the data. When we did a simple plot command RStudio automatically created a scatterplot because of the input format. Let's try another plot, like a boxplot.
+```{r}
+plot(data$Month,data$Temp, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month")
+boxplot(Temp~Month, data=data, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month") #Notice the input for a boxplot is dependent~independent variable
+```
+Now make your own boxplot for wind speed each month.
+```{r}
+
+```
+
+The boxplot is nice, but with other packages we can make it even better.
+RStudio has a package called ggplot2 (Grammar of Graphics Plot). 
+
+```{r}
+library(tidyverse) #RStudio has packages that contain lots of premade functions that can help us withour analysis. To load a package, type library() and put the name of the package in parentheses
+library(ggplot2)
+data$Month <- as.factor(data$Month) #To color code the months, group the data points that belong to each month first.
+ggplot(data = data)+ #Specify data set
+  aes(x = Month, y = Temp, fill = Month)+ #Your aesthetics. Identify your x and y axis as well as how you want to color code.
+  geom_boxplot()+ #What type of figure/plot to create
+  ylab("Temperature") + # x label
+  xlab("Month") + # y label
+  ggtitle("Temperature over each Month")
+```
+
+
