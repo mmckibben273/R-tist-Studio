@@ -46,7 +46,7 @@ May <- filter(data, Month == 5) #This line of code uses the filter() function. I
 
 Find the distribution of temperatures in the month of May in the code chunk below:
 ```{r}
-August <- filter(data, Month == 8)
+
 ```
 
 
