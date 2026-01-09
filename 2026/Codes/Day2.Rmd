@@ -1,0 +1,219 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-01-04"
+---
+
+Now let's see what RStudio can do with datasets.
+RStudio, being an opensource platform, has a large number of publicly available datasets. Run the code below to see some of the datasets.
+
+```{r}
+data()
+```
+
+Notice that at the bottom of the dataset list it says "Use ‘data(package = .packages(all.available = TRUE))’
+to list the data sets in all *available* packages." Let's try that!
+```{r}
+data(package = .packages(all.available = TRUE))
+```
+
+
+We are going to start with a simple data set with several variables. Use the code chunk below to load airquality and preview the dataset.
+```{r}
+data <- airquality #This line calls the airquality set and gives it the name "data"
+head(data) #This shows a preview of the dataset
+```
+
+As mentioned before, we can use RStudio to run stats on columns and rows in a dataset. 
+```{r}
+Temp <- data$Temp #Assign variable name to a column in the dataset. To pull out a column, you can use the variable name you assigned the dataset followed by a dollar sign ($) and the name of the column you want.
+summary(Temp) #Provides some information about the column, such as minimum value, maximum, mean, etc.
+```
+
+In the code chunk below, write code that will find the average wind speed.
+```{r}
+
+```
+
+There is a small problem with this: What is the unit of measurement for the wind speed? Often the datasets have simple names for their columns. To learn more about the context of our data, we need to know where it comes from. Type ?airquality in you console pane and read about the dataset.
+
+Our previous code looked across the whole dataset.Maybe we are interested in the distribution of temperatures in May vs. August.
+
+```{r}
+library(dplyr)
+May <- filter(data, Month == 5) #This line of code uses the filter() function. Inside the parentheses, pu the variable name of your dataset (in this case "data"), then a comma, followed by the name of the column you are selecting for and what values. In our airquality datset, the month of May is shown by the number 5. So we want to look at the distribution of temperatures only when the value of the month column equals 5. You could also modify this function to exclude the month of May instead by replacing == with !=.
+```
+
+Find the distribution of temperatures in the month of May in the code chunk below:
+```{r}
+August <- filter(data, Month == 8)
+```
+
+
+Find the distribution of temperatures in August:
+```{r}
+
+```
+
+You can find the differences in measurements between the two months by subtracting the variables
+```{r}
+Dif <- August-May
+```
+
+
+Let's move on to create a simple plot of the dataset. To plot data, we need to tell RStudio what we want the x and y axis to be. 
+```{r}
+plot(data$Month,data$Temp)
+```
+
+There are several major problems with this plot. Do you notice what is missing/how the figure could be improved?
+
+In addition to adding/changing labels on a plot, we can specify in our code how we want to visualize the data. When we did a simple plot command RStudio automatically created a scatterplot because of the input format. Let's try another plot, like a boxplot.
+```{r}
+plot(data$Month,data$Temp, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month")
+boxplot(Temp~Month, data=data, xlab = "Month", ylab = "Temperature",main = "Temperature over each Month") #Notice the input for a boxplot is dependent~independent variable
+```
+
+Now make your own boxplot for wind speed each month.
+```{r}
+
+```
+
+The boxplot is nice, but with other packages we can make it even better.
+RStudio has a package called ggplot2 (Grammar of Graphics Plot). 
+
+```{r}
+library(tidyverse) #RStudio has packages that contain lots of premade functions that can help us withour analysis. To load a package, type library() and put the name of the package in parentheses
+library(ggplot2)
+data$Month <- as.factor(data$Month) #To color code the months, group the data points that belong to each month first.
+ggplot(data = data)+ #Specify data set
+  aes(x = Month, y = Temp, fill = Month)+ #Your aesthetics. Identify your x and y axis as well as how you want to color code.
+  geom_boxplot()+ #What type of figure/plot to create
+  ylab("Temperature") + # x label
+  xlab("Month") + # y label
+  ggtitle("Temperature over each Month")+ theme_classic()
+```
+
+
+Great! Using ggplot, let's make some other figures. First, let's practice with a bar plot and a really useful dataset, the Palmer Penguin dataset.
+```{r }
+library(palmerpenguins) #Load the package containing the palmer penguin dataset
+data1 <- palmerpenguins::penguins #load the specific penguin dataset from the package
+
+ggplot(data1) + #This line tells RStudio what dataset you are pulling data from
+  aes(x = island, fill = species)+ #The aesthetics command tells ggplot what variable from the dataset to plot on the x axis
+  geom_bar()+ #What type of figure/plot to create, in this case a bar plot with geom_bar()
+  ylab("Number of Penguins") + # y label
+  xlab("Island") + # x label
+  ggtitle("Penguins Across Islands")+ #Title of dataset
+  theme_classic() #Theme changes the background from a grid to clear white. Feel free to explore how other themes (check Day 2 powerpoint for list of possible themes or look it up on your own)
+```
+
+
+Imitating the code above, run your own code creating a bar graph for the number of penguins in each species sampled and how many of each sex there were.
+```{r}
+
+```
+
+We can also represent the number of species as a pie chart.
+
+```{r}
+mytable <- table(data1$species) #This command pulls out the column we will be making a pie chart with and makes it into a table format
+head(mytable)
+lbls <- paste(names(mytable), "\n", mytable, sep="") # The paste() command tells RStudio to combine strings of characters and/or numbers. First, we pull the names of the columns from the dataset mytable. Then the command "/n" attaches the number in the column to the name. We then put the dataset we are pulling the labels from, mytable, and what separates columns, in this case spaces, which are represented by sep = "".
+pie(mytable, labels = lbls,
+   main="Pie Chart of Species\n (with sample sizes)")
+```
+
+Create a pie chart showing how many penguins were sampled on each island.
+
+```{r}
+
+```
+
+Now that we've played around with the penguin dataset, let's try looking at a flower dataset. Use the code below to create a histogram showing the sepal length of the flowers, colored by the species they belong to.
+
+```{r}
+data2 <- iris
+ggplot(data2, aes(x = Sepal.Length, fill=Species)) +
+  geom_histogram(binwidth = 0.5)+ #Try changing the bin width and rerunning the code to see how it changes your visualization. When deciding binwidths for your histograms, make sure to think about the range/length of your x axis.
+  theme_classic()+
+  ylab("Number of Flowers")+
+  xlab("Sepal Length (cm)")+
+  ggtitle("Sepal length distributions among 3 flower species")
+```
+
+Create your own histogram looking at petal width across species.
+
+```{r}
+
+```
+
+We can also use the flower data to create a scatterplot comparing two of the variables. First, create it with a simple plot like we did for our airquality dataset 
+
+```{r}
+plot(data2$Sepal.Length, data2$Sepal.Width,xlab = "Sepal Length (cm)", ylab = "Sepal Width (cm)",main = "Correlation between sepal length and width in flowers")
+```
+
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width) +
+  geom_point() +
+  theme_classic() +
+  ylab("Sepal Width (cm)")+
+  xlab("Sepal Length (cm)")+
+  ggtitle("Correlation between sepal length and sepal width in flowers")
+
+```
+
+This plot seems random and doesn't tell us much about the dataset. See what happens when you color by species.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) + #In this line we tell ggplot to color the points by the flower species
+  geom_point() +
+  theme_classic()+
+  ylab("Sepal Width (cm)")+
+  xlab("Sepal Length (cm)")+
+  ggtitle("Correlation between sepal length and sepal width in flowers")
+```
+
+Now write your own code to compare petal length and petal width.
+
+```{r}
+
+```
+
+We can also draw lines across our scatterplot to identify trends in the data.
+
+```{r}
+ggplot(data = data2) +
+  aes(x = Sepal.Length, y = Sepal.Width, color=Species) +
+  geom_point() +
+  geom_smooth(se=FALSE)+ #This line tells ggplot to create a line connecting the points. se=FALSE tells ggplot not to show the standard error of the lines. If you change this to TRUE, it will show standard error on the graph for each line.
+  theme_classic()+
+  ylab("Sepal Width (cm)")+
+  xlab("Sepal Length (cm)")+
+  ggtitle("Correlation between sepal length and sepal width in flowers")
+```
+
+
+
+
+Extra: More complicated graph with tidying we will learn next week!
+
+```{r}
+dt <- read.csv("https://rb.gy/zr65gg")
+dti <- dt[(dt$state == "Ohio") & (dt$cases > 10^4), ]
+ggplot(data = dti) + 
+  aes(x = reorder(county, cases), y = cases) + # order labels according to cases
+  geom_col() +
+  ylab("Number of COVID cases reported") + # x label
+  xlab("Ohio County") + # y label
+  scale_y_log10() + # transform the counts to logs
+  coord_flip()+
+  ggtitle(dti$date[1]) # main title (use current date)+
+  theme_classic()
+```
+
