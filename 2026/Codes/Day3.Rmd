@@ -1,0 +1,58 @@
+---
+title: "Day 3"
+output: html_document
+date: "2025-01-12"
+---
+
+
+
+Now that we've made some basic plots, let's practice making being more specific with our visualizations. We'll start by using our palmer penguin dataset, saved with variable name data1, to look at the data for only one island.
+
+```{r}
+filter(data1, island == "Biscoe") #The filter command takes the input filter(dataset,column name == "variable we want to have")
+```
+
+To pull out specific columns in the dataframe, we can use select().
+
+```{r}
+select(data1, species, island, sex) #For this command, use select(dataset,column(s) to pull out)
+select(data1, -year, -body_mass_g) #By putting a minus sign, we can exclude some columns from the dataset
+distinct(select(data1, species)) #Using the distinct() command removes all duplicates in the column we specify
+```
+
+This can get complicated if we have multiple tidying steps we want to incorporate. Luckily, we can make a pipeline in RStudio that connects multiple commands. We've been doing this in a way with our ggplot diagrams, with commands connected by + signs. To make a pipeline, we will type %>%.
+
+```{r}
+data1 %>%  #This tells RStudio to look at our Palmer Penguin dataset
+  drop_na(body_mass_g) %>% #This drops NA (not applicable/data not collected) values from the body mass column
+  summarise(avg = mean(body_mass_g), 
+            sd = sd(body_mass_g), 
+            median = median(body_mass_g))
+```
+
+What if we want to know the average body mass for each species?
+
+```{r}
+data1 %>% 
+  drop_na() %>% 
+  group_by(species) %>% #This separates the data and looks at the mean body mass for each species independently.
+  summarise(mean = mean(body_mass_g, na.rm = TRUE))
+```
+
+
+```{r}
+data1 %>% 
+  drop_na() %>% 
+  group_by(species, island) %>% #This separates the data and looks at the mean body mass for each species independently across each island.
+  summarise(mean = mean(body_mass_g, na.rm = TRUE))
+```
+
+Explore data tidying with the starwars dataset below. 
+
+```{r}
+data <- starwars
+
+
+```
+
+
