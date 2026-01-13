@@ -12,6 +12,10 @@ Now that we've made some basic plots, let's practice making being more specific 
 filter(data1, island == "Biscoe") #The filter command takes the input filter(dataset,column name == "variable we want to have")
 ```
 
+```{r}
+filter(data1, !species == "Adelie" & body_mass_g > 3400) #Another way to filter out a species is by putting an exclamation mark in front of the column name. Here we filter out all of the data points for Adelie penguins and datapoints for penguins with a body mass less than 3400 g
+
+```
 To pull out specific columns in the dataframe, we can use select().
 
 ```{r}
@@ -54,5 +58,15 @@ data <- starwars
 
 
 ```
+Some of the Star Wars cells have lists. For example, some characters were in multiple films. To be able to plot these categories, we need to unnest the lists.
 
+```{r}
+m <- data %>% unnest(films)
 
+```
+
+Make a bar chart showing the number of characters that appear in each Star Wars film.
+
+```{r}
+
+```
