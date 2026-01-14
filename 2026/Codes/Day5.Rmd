@@ -102,32 +102,7 @@ wilcox.test
 Find whether there is a significant difference between plants from Quebec and plants from Mississippi. Make sure to check normality. If the data is not normal use a Wilcoxon test. If it is normal use a t-test.
 ```{r}
 
-var.test(uptake ~ Type, data = data1)
-shapiro.test(data1$uptake)
 
-p <- ggbarplot(
-  data = data1,   
-  x = "Type",     
-  y = "uptake",         
-  fill = "Type",    
-  add = "mean_se",    
-  color = "black"
-)
-p
-
-wilcox.test <- compare_means(
-  uptake ~ Type,    
-  data = data1,   
-  method = "wilcox.test"   
-)
-
-wilcox.test
-
-p + stat_pvalue_manual(
-  wilcox.test,           
-  y.position = 40, 
-  label = "p.signif"       
-) + ylab("Uptake (μmol/m^2sec)") + ggtitle("CO2 Uptake for Plants from Quebec and Mississippi")
 ```
 
 You can also look to see whether the effect of chilling the plants has more of an effect on plants from Quebec or Wisconsin.
