@@ -1,0 +1,212 @@
+---
+title: "Untitled"
+output: html_document
+date: "2026-01-14"
+---
+
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+
+
+data1 <- CO2 #First we load a dataset to work with
+
+```
+
+Use the data tidying skills we discussed yesterday in the example code below to compare mean and standard deviation between treatment groups for plants in the CO2 dataset.
+```{r}
+data1 %>%
+  drop_na() %>%
+  group_by(Treatment) %>%
+  get_summary_stats(uptake, type = "mean_sd")
+```
+
+Run an F-test to check the variance of your data.
+```{r}
+var.test(uptake ~ Treatment, data = data1) #An F-test can be run with the function var.test(). When we run this test looking at differences in CO2 uptake variance between treated and control groups of plants, we get a p-value > 0.05, meaning we cannot reject the null hypothesis that the variances are equal between chilled and nonchilled plants.
+```
+
+
+Check data normality.
+```{r}
+shapiro.test(data1$uptake) #The Shapiro-Wilk test is to test for normality. Many statistical tests assume that data is normally distributed. Our results indicate it is not normally distributed.
+```
+
+Even though our data is not normal, let's go through the steps of running a t-test. First, a t-test compares the means of two groups. In this case the groups we want to compare are chilled vs. nonchilled plants. Use the code below to separate the chilled and nonchilled data and run a two-tailed t-test.
+
+```{r}
+chilled_plants <- data1 %>%
+  filter(Treatment == "chilled") %>%
+  pull(uptake)
+unchilled_plants <- data1 %>%
+  filter(Treatment == "nonchilled") %>%
+  pull(uptake)
+CO2_uptake_dif_t_test <- t.test(chilled_plants, unchilled_plants)
+CO2_uptake_dif_t_test
+```
+
+
+Since the data is not normal, we can use a Wilcoxon test to see if there is a significant difference between the groups.
+```{r}
+wilcox.test(uptake ~ Type, data = data1)
+```
+
+
+To plot statistical test results on a bar plot, they need to be in a certain format. We can get this format easily using the compare_means() function.
+
+```{r}
+t.test <- compare_means(
+  uptake ~ Treatment,    
+  data = data1,   
+  method = "t.test"   
+)
+
+t.test
+
+
+```
+
+Create a bar plot and add significance info with stat_pvalue_manual below.
+```{r}
+p <- ggbarplot(
+  data = data1,   
+  x = "Treatment",     
+  y = "uptake",         
+  fill = "Treatment",    
+  add = "mean_se",    
+  color = "black"
+)
+p
+
+p + stat_pvalue_manual(
+  t.test,           
+  y.position = 35, 
+  label = "p.signif"       
+) + ylab("Uptake (μmol/m^2sec)") + ggtitle("CO2 Uptake for Chilled and Nonchilled Plants")
+```
+
+
+You can also run and add the wilcoxon test this way.
+```{r}
+wilcox.test <- compare_means(
+  uptake ~ Treatment,    
+  data = data1,   
+  method = "wilcox.test"   
+)
+
+wilcox.test
+```
+
+Find whether there is a significant difference between plants from Quebec and plants from Mississippi. Make sure to check normality. If the data is not normal use a Wilcoxon test. If it is normal use a t-test.
+```{r}
+
+var.test(uptake ~ Type, data = data1)
+shapiro.test(data1$uptake)
+
+p <- ggbarplot(
+  data = data1,   
+  x = "Type",     
+  y = "uptake",         
+  fill = "Type",    
+  add = "mean_se",    
+  color = "black"
+)
+p
+
+wilcox.test <- compare_means(
+  uptake ~ Type,    
+  data = data1,   
+  method = "wilcox.test"   
+)
+
+wilcox.test
+
+p + stat_pvalue_manual(
+  wilcox.test,           
+  y.position = 40, 
+  label = "p.signif"       
+) + ylab("Uptake (μmol/m^2sec)") + ggtitle("CO2 Uptake for Plants from Quebec and Mississippi")
+```
+
+You can also look to see whether the effect of chilling the plants has more of an effect on plants from Quebec or Wisconsin.
+```{r}
+separated.stats <- data1 %>%
+  group_by(Type) %>% # Group  the data by where the plants came from first
+    wilcox_test(uptake ~ Treatment) %>% # Within each type of plant (plant from Quebec or plant from Mississippi) perform a Wilcoxon test to look for diffferences in CO2 uptakes between treatments
+  adjust_pvalue() %>% # Adjust p-value for multiple comparisons. For more about why we adjust p-values, check out the dead salmon paper on Github for a fun read!
+  add_significance() 
+separated.stats
+```
+
+```{r}
+q <- ggbarplot(
+  data = data1,   
+  x = "Treatment",       
+  y = "uptake",         
+  fill = "Type",    
+  add = "mean_se",  
+  color = "black",    
+  position = position_dodge(0.8) # Separate type bars
+)
+q
+```
+
+```{r}
+q + stat_pvalue_manual(
+  separated.stats,           
+  y.position = c(42,40), 
+  label = "p.adj.signif",
+  position = position_dodge(0.5),               
+  tip.length = 0.002      
+) + ylab("Uptake (μmol/m^2sec)") + ggtitle("CO2 Uptake for Plants from Quebec and Mississippi")
+```
+
+
+We can also run a one-tailed t-test. Below, we hypothesize the mean height of the tree will be equal to 70. Then the t-test checks to see if the data supports this assumption. Here we are only looking in one column and we have an expectation for what our mean will be.
+```{r}
+data(trees)
+str(trees)
+summary(trees)
+t.test(trees$Height, mu = 70) #Run a t-test on the column Height in the trees data set with the null hypothesis that the mean height of the trees is 70. Alternative hypothesis is that the mean height is significantly greater or less than 70.
+```
+
+```{r}
+t.test(trees$Height, mu = 70, alternative = "greater") #Run a t-test on the column Height in the trees data set with the null hypothesis that the mean height of the trees is 70. Alternative hypothesis is that the mean height is significantly greater than 70.
+```
+
+Correlation tests look for covariance with small sample sizes.
+```{r}
+cor.test(trees$Height, trees$Volume)
+```
+
+```{r}
+cor.test(trees$Height, trees$Volume, method = "spearman")
+```
+
+
+We can also run a chi-squared test, if our sample size is large, or a fisher test, when it's small. 
+```{r}
+Dominant_hand_Sibling_cor <- matrix(c((No sibling right handed), (No sibling left handed), (Sibling right handed), (Sibling left handed)), nrow = 2)
+Dominant_hand_Sibling_cor
+colnames(Dominant_hand_Sibling_cor) <- c("No sibling", "Sibling")
+rownames(Dominant_hand_Sibling_cor) <- c("Right handed", "Left handed")
+Dominant_hand_Sibling_cor
+chisq.test(Dominant_hand_Sibling_cor)
+
+fisher_test(Dominant_hand_Sibling_cor)
+```
+Below is an example of an ANOVA test, the same one provided by RStudio.
+```{r}
+data("ToothGrowth")
+df <- ToothGrowth
+df$dose <- as.factor(df$dose)
+
+
+res.anova <- Anova(lm(len ~ dose*supp, data = df))
+anova_summary(res.anova)
+```
+
+
+
