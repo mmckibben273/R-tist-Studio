@@ -1,0 +1,74 @@
+```{r}
+library(RCurl)
+```
+
+Bacteria on Human skin
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Bacteria%20on%20Human%20Skin/Antibiotic_Sensitivity.csv")
+Antibiotic_Sensitivity <- read.csv(text = x)
+colnames(Antibiotic_Sensitivity)[colnames(Antibiotic_Sensitivity) == 'ï..Sample'] <- 'Sample'
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Bacteria%20on%20Human%20Skin/Contingency_Table.csv")
+Contingency_Table <- read.csv(text = x)
+colnames(Contingency_Table)[colnames(Contingency_Table) == 'ï..'] <- ''
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Bacteria%20on%20Human%20Skin/Participant_Data.csv")
+Participant_Data <- read.csv(text = x)
+colnames(Participant_Data)[colnames(Participant_Data) == 'ï..Sample'] <- 'Sample'
+```
+
+
+Chicken Toys
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Chicken%20Toys/Chicken_Data.csv")
+Chicken_Data <- read.csv(text = x)
+colnames(Chicken_Data)[colnames(Chicken_Data) == 'ï..Breed'] <- 'Breed'
+```
+
+Empathetic engagement with modernist literature
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Empathetic%20engagement%20with%20modernist%20literature/Empathy_Score_Data.csv")
+Empathy_Score_Data <- read.csv(text = x)
+colnames(Empathy_Score_Data)[colnames(Empathy_Score_Data) == 'ï..Attribute'] <- 'Attribute'
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Empathetic%20engagement%20with%20modernist%20literature/Empathy_Score_Ratio_Data.csv")
+Empathy_Score_Ratio_Data <- read.csv(text = x)
+colnames(Empathy_Score_Ratio_Data)[colnames(Empathy_Score_Ratio_Data) == 'ï..'] <- ''
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Empathetic%20engagement%20with%20modernist%20literature/Reading_Habits_Data.csv")
+Reading_Habits_Data <- read.csv(text = x)
+colnames(Reading_Habits_Data)[colnames(Reading_Habits_Data) == 'ï..Gender'] <- 'Gender'
+```
+
+
+Eye Disease
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Eye%20Disease/Eye_Table1_Data.csv")
+Eye_Table1 <- read.csv(text = x)
+colnames(Eye_Table1)[colnames(Eye_Table1) == 'ï..Eye_Disease'] <- 'Eye_Disease'
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Eye%20Disease/Eye_Table2_Data.csv")
+Eye_Table2 <- read.csv(text = x)
+colnames(Eye_Table2)[colnames(Eye_Table2) == 'ï..Sex'] <- 'Sex'
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Eye%20Disease/Eye_Table3_Data.csv")
+Eye_Table3 <- read.csv(text = x)
+colnames(Eye_Table3)[colnames(Eye_Table3) == 'ï..Age'] <- 'Age'
+```
+
+
+Rubik's cube
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Rubik's%20cube/Rubiks_Cube_Data.csv")
+Rubiks <- read.csv(text = x)
+colnames(Rubiks)[colnames(Rubiks) == 'ï..ID'] <- 'ID'
+```
+
+
+Stomatal conductance
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/Stomatal%20Conductance/Stomatal_Data.csv")
+Stomatal_Data <- read.csv(text = x)
+colnames(Stomatal_Data)[colnames(Stomatal_Data) == 'ï..Plant'] <- 'Plant'
+```
+
+UV and Thermal Mass
+```{r}
+x <- getURL("https://raw.githubusercontent.com/mmckibben273/R-tist-Studio/refs/heads/main/2026/Datasets/UV%20and%20Thermal%20mass%20affect%20surface%20temp%20/UV_Data.csv")
+UV_Thermal_Mass_Data <- read.csv(text = x)
+colnames(UV_Thermal_Mass_Data)[colnames(UV_Thermal_Mass_Data) == 'ï..Day'] <- 'Day'
+```
