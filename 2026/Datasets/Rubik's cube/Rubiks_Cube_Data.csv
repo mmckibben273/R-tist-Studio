@@ -1,0 +1,10 @@
+﻿ID,Gender,Cognitive_Pre,Cognitive_Post,Dexterity_Pre,Dexterity_Post,Mood_Pre,Mood_Post,Time_Cube,Time_Puzzles
+P01,M,Medium,High,Low,Medium,Neutral,Happy,20,15
+P02,F,Low,Medium,Low,Low,Sad,Neutral,10,30
+P03,M,Medium,Medium,Medium,High,Happy,Happy,30,20
+P04,F,Low,Medium,Low,Medium,Neutral,Neutral,15,25
+P05,M,High,High,Medium,High,Happy,Happy,40,10
+P06,F,Medium,High,Medium,High,Neutral,Happy,25,25
+P07,M,Low,Medium,Low,Medium,Sad,Neutral,10,20
+P08,F,Medium,High,Low,Medium,Neutral,Happy,15,30
+P09,M,High,High,High,High,Happy,Happy,35,20
